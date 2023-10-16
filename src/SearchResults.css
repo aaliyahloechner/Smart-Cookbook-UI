@@ -1,19 +1,18 @@
-/* Set a fixed width and height for the recipe images */
 .recipe-icon {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.2); /* Adjust the alpha (last value) to control opacity */
+  background-color: rgba(0, 0, 0, 0.2); 
   padding: 8px;
-  width: 400px; /* Set a fixed width for the images */
-  height: 200px; /* Set a fixed height for the images */
+  width: 400px; 
+  height: 200px;
   justify-content: center;
 }
 
 .recipe-icon img {
-  width: 400px; /* Set a fixed width for the images */
-  height: 200px; /* Set a fixed height for the images */
-  object-fit: cover; /* Maintain aspect ratio and cover the container */
+  width: 400px; 
+  height: 200px; 
+  object-fit: cover; 
   align-items: center;
   justify-content: center;
 
