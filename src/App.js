@@ -5,12 +5,60 @@ import SearchResults from './SearchResults';
 import RecipeDetails from './RecipeDetails';
 import ProjectDetails from './ProjectDetails';
 import recipes from './recipes.json';
+import Sidebar from './Sidebar';
+import SavedRecipes from './SavedRecipes';
 
-function App() {
+
+function App({ }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState('');
   const [selectedDietaryRestrictions, setSelectedDietaryRestrictions] = useState([]);
-  const [currentScreen, setCurrentScreen] = useState('search'); 
+  const [currentScreen, setCurrentScreen] = useState('search');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSavedRecipesPopupOpen, setIsSavedRecipesPopupOpen] = useState(false);
+  const [userSavedRecipes, setUserSavedRecipes] = useState([]);
+
+  const [userRecipes, setUserRecipes] = useState({
+    user1: [],
+    user2: [],
+    user3: [],
+    user4: [],
+  });
+
+  // const handleSaveRecipe = (user, recipeTitle) => {
+  //   // Update the saved recipes for the specific user
+  //   setUserRecipes((prevUserRecipes) => ({
+  //     ...prevUserRecipes,
+  //     [user]: [...prevUserRecipes[user], recipeTitle],
+  //   }));
+  //   setSavedRecipes({
+  //     ...savedRecipes,
+  //     [user]: [...savedRecipes[user], recipeTitle],
+  //   });
+  // };
+  const [savedRecipes, setSavedRecipes] = useState({});
+
+  const handleSaveRecipe = (user, recipeTitle) => {
+    setSavedRecipes((prevSavedRecipes) => {
+      const newSavedRecipes = { ...prevSavedRecipes };
+
+      if (!newSavedRecipes[user]) {
+        newSavedRecipes[user] = [];
+      }
+
+      newSavedRecipes[user].push(recipeTitle);
+
+      return newSavedRecipes;
+    });
+  };
+
+  const handleUserClick = (user) => {
+    const savedRecipesForUser = userRecipes[user] || [];
+    setUserSavedRecipes(savedRecipesForUser);
+    setIsSavedRecipesPopupOpen(true);
+  };
+
+
 
   // Function to reset all selection inputs
   const clearAllSelections = () => {
@@ -18,6 +66,14 @@ function App() {
     setSelectedDifficulty('');
     setSelectedDietaryRestrictions([]);
   };
+
+  function toggleSidePanel() {
+    setIsMenuOpen(!isMenuOpen);
+  }
+  const displayUserContent = (user) => {
+    handleUserClick(user);
+  };
+
 
   const filterRecipes = (recipe) => {
     const title = recipe.title.toLowerCase();
@@ -47,18 +103,50 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <header>
+        <header className="site-header">
           <h1>Smart Cookbook</h1>
-          <div className="select-containers">{
-             currentScreen === 'search' && (
-              <>
+        </header>
+        <div className={`side-panel${isMenuOpen ? ' open' : ''}`}>
+          {/* Hamburger menu within the side panel */}
+          <div className="hamburger-menu" onClick={toggleSidePanel}>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+          </div>
+
+          {/* Rest of the side panel content */}
+          <div className="side-panel-content">
+            <Sidebar user="1" onClick={handleUserClick} setCurrentScreen={setCurrentScreen} displayUserContent={displayUserContent} />
+            <Sidebar user="2" onClick={handleUserClick} setCurrentScreen={setCurrentScreen} displayUserContent={displayUserContent} />
+            <Sidebar user="3" onClick={handleUserClick} setCurrentScreen={setCurrentScreen} displayUserContent={displayUserContent} />
+            <Sidebar user="4" onClick={handleUserClick} setCurrentScreen={setCurrentScreen} displayUserContent={displayUserContent} />
+          </div>
+        </div>
+        {isSavedRecipesPopupOpen && (
+          <SavedRecipes savedRecipes={userSavedRecipes} />
+        )}
+
+        {/* Overlay background (unchanged) */}
+        <div className={`overlay${isMenuOpen ? ' open' : ''}`}></div>
+        <div className="hamburger-menu" onClick={toggleSidePanel}>
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+        </div>
+
+
+        <div className="select-container">{
+          currentScreen === 'search' && (
+            <>
+              <div className='select-containers'>
                 <a
-                  href="https://docs.google.com/document/d/1HPRjXsFpWOdFxGxqm2lOKTw25tLWkeu-cj98PaQMnKk/edit?usp=sharing" 
+                  href="https://docs.google.com/document/d/1HPRjXsFpWOdFxGxqm2lOKTw25tLWkeu-cj98PaQMnKk/edit?usp=sharing"
                   target="_blank" // Open in a new tab/window
                   rel="noopener noreferrer" // Recommended for security
                 >
                   <button className="top-right-button">Project Details</button>
                 </a>
+
                 <input
                   type="text"
                   placeholder="Search keywords or specific recipes..."
@@ -93,13 +181,15 @@ function App() {
                 </select>
 
                 <button onClick={clearAllSelections}>Clear all selections</button>
-                <p>Showing {filteredRecipes.length} recipes:</p>
+              </div>
+              <div className="show-recipes">
 
-            
-          </>
+                <p>Showing {filteredRecipes.length} recipes:</p></div>
+            </>
+
           )}</div>
-          
-        </header>
+
+
         <Routes>
           <Route
             path="/"
@@ -111,19 +201,39 @@ function App() {
             }
           />
           <Route
+            path="/projectdetails"
+            element={<ProjectDetails />} // Define the route for ProjectDetails
+          />
+          <Route
             path="/recipe/:id"
             element={
               <RecipeDetails
                 recipes={recipes}
-                currentScreen={currentScreen} // Pass the currentScreen state
-                setCurrentScreen={setCurrentScreen} // Pass the function to set the current screen
+                onSaveRecipe={handleSaveRecipe} // Pass the onSaveRecipe function
+                setCurrentScreen={setCurrentScreen}
               />
             }
           />
           <Route
-            path="/projectdetails"
-            element={<ProjectDetails />} // Define the route for ProjectDetails
+            path="/"
+            element={
+              currentScreen === 'search' ? (
+                <SearchResults
+                  recipes={recipes.filter(filterRecipes)}
+                  setCurrentScreen={setCurrentScreen}
+                />
+              ) : (
+                <RecipeDetails
+                  recipes={recipes}
+                  onSaveRecipe={handleSaveRecipe}
+                  setCurrentScreen={setCurrentScreen}
+                />
+              )
+            }
           />
+          <Route path="/savedrecipes" element={<SavedRecipes savedRecipes={savedRecipes} />} />
+
+
         </Routes>
       </div>
     </Router>

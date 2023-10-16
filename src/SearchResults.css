@@ -1,20 +1,33 @@
-.recipe-title {
-    font-family: Cambria, serif; 
-    font-size: 16px; 
-    font-weight: normal; 
-  }
-
+/* Set a fixed width and height for the recipe images */
 .recipe-icon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: -20px;
-  }
-  
-  .recipe-icon img {
-    width: 300px; /* Adjust the width as needed */
-    height: 300px; /* Adjust the height as needed */
-    margin-bottom: 8px; /* Add some spacing between the image and title */
-  }
-  
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.2); /* Adjust the alpha (last value) to control opacity */
+  padding: 8px;
+  width: 400px; /* Set a fixed width for the images */
+  height: 200px; /* Set a fixed height for the images */
+  justify-content: center;
+}
+
+.recipe-icon img {
+  width: 400px; /* Set a fixed width for the images */
+  height: 200px; /* Set a fixed height for the images */
+  object-fit: cover; /* Maintain aspect ratio and cover the container */
+  align-items: center;
+  justify-content: center;
+
+}
+.gridContainer{
+  width:93%;
+  justify-content: center;
+  display: grid;
+  grid-template-columns: auto-fill, minmax(30%, 1fr);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-left: 50px;
+  margin-bottom: 200px;
+  margin-top: 0;
+}
+
