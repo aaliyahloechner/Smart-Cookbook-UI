@@ -1,0 +1,7 @@
+[context.install]
+  publish = "install/"
+  command = "npm i"
+
+[context.run-app]
+  publish = "start/"
+  command = "npm start"
